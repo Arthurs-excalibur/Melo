@@ -45,7 +45,7 @@ export async function runCompatibilityComparison({
   );
 
   const sharedProfile = toEmotionalProfile(sharedCard.emotionalProfile);
-  const sharedGenres = sharedCard.topGenres.map((genre) => ({
+  const sharedGenres = sharedCard.topGenres.map((genre: string) => ({
     genre,
     weight: 100,
     relatedGenres: [],
