@@ -218,7 +218,7 @@ export async function POST(req: Request) {
               existingAnalysis.moodScore,
             ),
             timeline: {
-              eras: existingAnalysis.listeningEras.map((era, index) => ({
+              eras: existingAnalysis.listeningEras.map((era: string, index: number) => ({
                 era,
                 description: `A unique sonic phase in your auditory footprint.`,
                 intensity: index === 0 ? "High" : "Moderate",
