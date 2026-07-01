@@ -1,0 +1,19 @@
+/* 
+  Please paste the CSS for the RetroTvError component here. 
+  It looks like this component was adapted from Uiverse.io or a similar site, 
+  which usually provides a CSS file alongside the HTML/JSX.
+*/
+
+.main_wrapper {
+  /* This prevents the wrapper from breaking if CSS is missing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text_404 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 1rem;
+}

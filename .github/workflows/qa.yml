@@ -1,0 +1,76 @@
+name: QA Automation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_lighthouse:
+        description: Run Lighthouse budgets
+        required: false
+        default: "false"
+
+jobs:
+  qa:
+    name: Playwright QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      NEXTAUTH_SECRET: melo-ci-playwright-secret
+      NEXTAUTH_URL: http://127.0.0.1:3000
+      SPOTIFY_CLIENT_ID: playwright-client-id
+      SPOTIFY_CLIENT_SECRET: playwright-client-secret
+      RUN_LIGHTHOUSE: ${{ github.event.inputs.run_lighthouse == 'true' && '1' || '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Run API tests
+        run: npm run test:api -- --project=chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e -- --project=chromium
+
+      - name: Run accessibility tests
+        run: npm run test:a11y
+
+      - name: Run visual regression tests
+        run: npm run test:visual
+
+      - name: Run Lighthouse
+        if: env.RUN_LIGHTHOUSE == '1'
+        run: npm run test:perf
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
+
+      - name: Upload raw test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+          if-no-files-found: ignore

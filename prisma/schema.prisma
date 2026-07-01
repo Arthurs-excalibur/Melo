@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  spotifyId     String    @unique
+  email         String?   @unique
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tokens        SpotifyToken?
+  history       ListeningHistory[]
+  analyses      Analysis[]
+  shareCards    ShareCard[]
+  compatibility1 CompatibilityResult[] @relation("User1")
+  compatibility2 CompatibilityResult[] @relation("User2")
+}
+
+model SpotifyToken {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  accessToken        String
+  refreshToken       String
+  accessTokenExpires DateTime
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Track {
+  id            String   @id // Spotify Track ID
+  name          String
+  durationMs    Int
+  popularity    Int
+  explicit      Boolean
+  previewUrl    String?
+  
+  albumId       String
+  albumName     String
+  albumImage    String?
+
+  artists       TrackArtist[]
+  history       ListeningHistory[]
+  audioFeatures AudioFeature?
+}
+
+model Artist {
+  id         String   @id // Spotify Artist ID
+  name       String
+  popularity Int
+  genres     String[]
+  imageUrl   String?
+
+  tracks     TrackArtist[]
+}
+
+model TrackArtist {
+  trackId  String
+  artistId String
+
+  track    Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([trackId, artistId])
+}
+
+model AudioFeature {
+  trackId          String @id
+  energy           Float
+  valence          Float
+  danceability     Float
+  tempo            Float
+  acousticness     Float
+  instrumentalness Float
+  speechiness      Float
+  liveness         Float
+  loudness         Float
+  mode             Int
+  key              Int
+  timeSignature    Int
+
+  track            Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+}
+
+model ListeningHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  trackId   String
+  playedAt  DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackId, playedAt])
+  @@index([userId, playedAt])
+}
+
+model Analysis {
+  id               String   @id @default(uuid())
+  userId           String
+  analyzedAt       DateTime @default(now())
+  
+  // AI Outputs
+  archetype        String
+  narrative        String
+  emotionalSummary String
+  moodTitle        String
+  auraColor        String
+  auraDescription  String
+  shareableTagline String
+  listeningEras    String[]
+  timeRange        String   @default("medium_term")
+
+  // Aggregated Inputs
+  valence          Float
+  energy           Float
+  danceability     Float
+  moodScore        Float
+  chaosIndex       Float
+  emotionalDepth   Float
+  nostalgiaFactor  Float
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  genreClusters    GenreCluster[]
+
+  @@index([userId, timeRange])
+}
+
+model GenreCluster {
+  id            String   @id @default(uuid())
+  analysisId    String
+  genre         String
+  weight        Float
+  affinity      String   // "core" | "adjacent" | "fringe"
+  relatedGenres String[]
+
+  analysis      Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  @@index([analysisId, genre])
+}
+
+model ShareCard {
+  id               String   @id // nanoid
+  userId           String
+  createdAt        DateTime @default(now())
+  expiresAt        DateTime
+
+  // Snapshot of Analysis
+  archetype        String
+  narrative        String
+  auraColor        String
+  auraDescription  String
+  moodTitle        String
+  tagline          String
+  topGenres        String[]
+
+  // Audio DNA snapshot stored as JSON
+  audioDNA         Json
+  emotionalProfile Json
+  moodGraph        Json?
+  topTracks        Json?
+  timeRange        String   @default("medium_term")
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([userId, timeRange])
+}
+
+model CompatibilityResult {
+  id        String   @id @default(uuid())
+  user1Id   String
+  user2Id   String
+  score     Float
+  breakdown Json
+  createdAt DateTime @default(now())
+
+  user1     User     @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+}
+
+/// Tracks the lifecycle of Inngest background jobs.
+/// Replaces BullMQ's Redis-backed job state storage.
+model JobStatus {
+  id        String   @id           // nanoid — same value returned as `jobId` to frontend
+  type      String                 // "analysis" | "compatibility"
+  status    String                 // "processing" | "completed" | "failed"
+  progress  String?                // latest progress message (e.g. "Fetching Spotify data...")
+  result    Json?                  // final result payload (replaces BullMQ job.returnvalue)
+  error     String?                // failure reason (replaces BullMQ job.failedReason)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
