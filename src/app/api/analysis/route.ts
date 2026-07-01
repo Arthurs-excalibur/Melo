@@ -193,7 +193,7 @@ export async function POST(req: Request) {
             genreGalaxy: buildGenreGalaxyPayload(
               (existingAnalysis.genreClusters.length > 0
                 ? existingAnalysis.genreClusters
-                : (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).map((genre: string, index) => ({
+                : (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).map((genre: string, index: number) => ({
                     id: genre,
                     analysisId: existingAnalysis.id,
                     genre,

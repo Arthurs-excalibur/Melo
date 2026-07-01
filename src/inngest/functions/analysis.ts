@@ -284,7 +284,7 @@ export const analysisFunction = inngest.createFunction(
             "2YZyV6ZvuUnGs7c2HCC565", // Kendrick Lamar
             "3i248gqZCr9j4jPt7uE512", // Brent Faiyaz
           ]);
-          topArtists = fallbackArtistsRes.artists.map((a: SpotifyArtist, index) => ({
+          topArtists = fallbackArtistsRes.artists.map((a: SpotifyArtist, index: number) => ({
             name: a.name,
             role: a.genres?.[0] || "Artist",
             score: `${a.popularity ?? 75}%`,
