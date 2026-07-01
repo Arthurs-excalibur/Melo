@@ -193,14 +193,14 @@ export async function POST(req: Request) {
             genreGalaxy: buildGenreGalaxyPayload(
               (existingAnalysis.genreClusters.length > 0
                 ? existingAnalysis.genreClusters
-                : (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).map((genre, index) => ({
+                : (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).map((genre: string, index) => ({
                     id: genre,
                     analysisId: existingAnalysis.id,
                     genre,
                     weight: index === 0 ? 85 : index === 1 ? 70 : index === 2 ? 55 : index === 3 ? 40 : 30,
                     affinity: index === 0 ? "core" : index < 3 ? "adjacent" : "peripheral",
-                    relatedGenres: (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).filter(g => g !== genre).slice(0, 2),
-                  }))).map(gc => ({
+                    relatedGenres: (shareCard.topGenres.length > 0 ? shareCard.topGenres : ["shoegaze", "ambient", "dream pop", "hyperpop", "indie rock"]).filter((g: string) => g !== genre).slice(0, 2),
+                  }))).map((gc: { genre: string; weight: number; relatedGenres: string[]; affinity: string }) => ({
                 genre: gc.genre,
                 weight: gc.weight,
                 relatedGenres: gc.relatedGenres,

@@ -13,9 +13,10 @@ type IconProps = React.SVGProps<SVGSVGElement>;
 const MOBILE_BREAKPOINT = 768;
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean>(() => window.innerWidth < MOBILE_BREAKPOINT);
+  const [isMobile, setIsMobile] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
