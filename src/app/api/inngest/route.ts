@@ -20,7 +20,11 @@ import {
 // This prevents timeouts during long Inngest steps.
 export const maxDuration = 60;
 
-export const { GET, POST, PUT } = serve({
+export async function GET() {
+  return Response.json({ ok: true }, { status: 200 });
+}
+
+export const { POST, PUT } = serve({
   client: inngest,
   functions: [
     analysisFunction,

@@ -110,8 +110,14 @@ export async function GET(req: Request) {
   }
 
   // Replaces: compatibilityQueue.getJob(jobId) + job.getState() + job.returnvalue
-  const jobStatus = await db.jobStatus.findUnique({ where: { id: jobId } });
-  
+  let jobStatus;
+  try {
+    jobStatus = await db.jobStatus.findUnique({ where: { id: jobId } });
+  } catch (e) {
+    console.warn("Failed to query jobStatus:", e);
+    return Response.json({ error: "Job not found" }, { status: 404 });
+  }
+
   if (!jobStatus) {
     return Response.json({ error: "Job not found" }, { status: 404 });
   }
