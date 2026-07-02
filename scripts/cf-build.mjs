@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 
 async function main() {
   const apiEntry = require.resolve("@opennextjs/cloudflare");
-  const pkgDir = dirname(dirname(apiEntry));
+  const pkgDir = dirname(dirname(dirname(apiEntry)));
   const patchTarget = join(pkgDir, "dist", "cli", "build", "bundle-server.js");
 
   const original = await readFile(patchTarget, "utf8");
