@@ -18,7 +18,6 @@ jobs:
           cache: npm
 
       - run: npm ci --ignore-scripts
-      - run: npx prisma generate
       - run: npm run cf:build
 
       - name: Deploy to Cloudflare Pages

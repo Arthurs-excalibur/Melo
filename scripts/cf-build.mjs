@@ -1,14 +1,14 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 
 const require = createRequire(import.meta.url);
 
 async function main() {
-  const patchTarget = require.resolve(
-    "@opennextjs/cloudflare/dist/cli/build/bundle-server.js"
-  );
+  const apiEntry = require.resolve("@opennextjs/cloudflare");
+  const pkgDir = dirname(dirname(apiEntry));
+  const patchTarget = join(pkgDir, "dist", "cli", "build", "bundle-server.js");
 
   const original = await readFile(patchTarget, "utf8");
 
