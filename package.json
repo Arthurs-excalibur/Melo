@@ -8,6 +8,10 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
+    "cf:build": "npx @opennextjs/cloudflare",
+    "cf:deploy": "npm run cf:build && wrangler deploy",
+    "cf:preview": "npm run cf:build && wrangler dev",
+    "cf:upload": "npm run cf:build && wrangler pages deployment put",
     "test:e2e": "playwright test tests/e2e",
     "test:api": "playwright test tests/api",
     "test:a11y": "playwright test tests/accessibility --project=chromium",
@@ -20,6 +24,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@opennextjs/cloudflare": "^1.20.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@radix-ui/react-slot": "^1.3.0",
@@ -67,6 +72,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.22.0",
     "typescript": "^5",
-    "wait-on": "^9.0.10"
+    "wait-on": "^9.0.10",
+    "wrangler": "^4.106.0"
   }
 }
