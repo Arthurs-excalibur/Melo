@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ["@prisma/client", ".prisma/client", "sharp"],
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "sharp", "pg-cloudflare"],
   outputFileTracingIncludes: {
     "**/*": [
       "./node_modules/pg-cloudflare/dist/**",
